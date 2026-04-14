@@ -199,6 +199,12 @@ to{opacity:1;transform:scale(1)}
 <!-- APP -->
 <div id="app">
 
+<!-- 🔥 NEW ALARM PANEL (ADD ONLY — NOTHING REMOVED) -->
+<div style="text-align:center;margin-bottom:10px;">
+<input type="time" id="alarmTime">
+<button onclick="setAlarm()">Set Alarm ⏰</button>
+</div>
+
 <div class="header">To Do List ✔</div>
 <div id="time"></div>
 <div id="streak">🔥 0</div>
@@ -257,7 +263,7 @@ to{opacity:1;transform:scale(1)}
 
 <script>
 
-/* 🔥 FIREBASE CONFIG ADDED */
+/* 🔥 FIREBASE SAME */
 const firebaseConfig = {
 apiKey: "AIzaSyARfGVJuI_xTmWkWZLcHY-ia783a8lcDVg",
 authDomain: "aryan-routine-app.firebaseapp.com",
@@ -272,7 +278,17 @@ firebase.initializeApp(firebaseConfig);
 /* SOUND */
 const sound=new Audio("https://www.fesliyanstudios.com/play-mp3/387");
 
-/* LOGIN */
+/* 🔥 SOUND FIX ADD */
+document.addEventListener("click",()=>{
+try{sound.currentTime=0;}catch(e){}
+});
+
+/* 🔥 NOTIFICATION PERMISSION ADD */
+if("Notification" in window){
+Notification.requestPermission();
+}
+
+/* LOGIN SAME */
 function login(){
 let name=document.getElementById("name").value;
 
@@ -296,7 +312,7 @@ showPopup("ACCESS DENIED");
 }
 }
 
-/* POPUP */
+/* POPUP SAME */
 function showPopup(msg){
 let p=document.getElementById("popup");
 p.innerText=msg;
@@ -304,18 +320,18 @@ p.classList.add("show");
 setTimeout(()=>p.classList.remove("show"),1500);
 }
 
-/* TIME */
+/* TIME SAME */
 setInterval(()=>{
 document.getElementById("time").innerText=new Date().toLocaleString();
 },1000);
 
-/* TOGGLE */
+/* TOGGLE SAME */
 function toggle(id){
 let el=document.getElementById(id);
 el.style.maxHeight = el.style.maxHeight ? null : el.scrollHeight+"px";
 }
 
-/* SAVE TASK */
+/* SAVE + LOAD SAME */
 function saveTasks(){
 let arr=[];
 document.querySelectorAll(".box").forEach(b=>{
@@ -324,7 +340,6 @@ arr.push(b.classList.contains("checked"));
 localStorage.setItem("tasks",JSON.stringify(arr));
 }
 
-/* LOAD TASK */
 function loadTasks(){
 let arr=JSON.parse(localStorage.getItem("tasks")||"[]");
 document.querySelectorAll(".box").forEach((b,i)=>{
@@ -332,7 +347,7 @@ if(arr[i]) b.classList.add("checked");
 });
 }
 
-/* TICK */
+/* TICK SAME */
 function tick(el){
 event.stopPropagation();
 try{sound.currentTime=0;sound.play();}catch(e){}
@@ -341,7 +356,7 @@ saveTasks();
 checkAll();
 }
 
-/* CHECK ALL */
+/* CHECK SAME */
 function checkAll(){
 let all=document.querySelectorAll(".box");
 let done=true;
@@ -357,7 +372,7 @@ sendNotification("All Tasks Done 🔥","Great job Aryan!");
 }
 }
 
-/* NOTIFICATION */
+/* NOTIFICATION SAME */
 function sendNotification(title,body){
 if(Notification.permission==="granted"){
 new Notification(title,{body:body});
@@ -366,12 +381,12 @@ alert(title+" - "+body);
 }
 }
 
-/* DONE */
+/* DONE SAME */
 function done(){
 showPopup("Streak will count at 11 PM");
 }
 
-/* STREAK */
+/* STREAK SAME */
 function checkStreak(){
 let now=new Date();
 let hour=now.getHours();
@@ -385,10 +400,9 @@ localStorage.setItem("allDone","false");
 
 document.getElementById("streak").innerText="🔥 "+(localStorage.getItem("streak")||0);
 }
-
 setInterval(checkStreak,60000);
 
-/* REMINDER */
+/* REMINDER SAME */
 function startReminders(){
 setInterval(()=>{
 let now=new Date();
@@ -403,7 +417,27 @@ if(h===22 && m===0) alert("Sleep 😴");
 },60000);
 }
 
-/* MASSIVE QUOTES */
+/* 🔥 ALARM SYSTEM ADD */
+let alarmTime=null;
+
+function setAlarm(){
+alarmTime=document.getElementById("alarmTime").value;
+alert("Alarm set for "+alarmTime);
+}
+
+setInterval(()=>{
+if(alarmTime){
+let now=new Date();
+let current=now.getHours().toString().padStart(2,"0")+":"+now.getMinutes().toString().padStart(2,"0");
+
+if(current===alarmTime){
+alert("⏰ Alarm Ringing!");
+alarmTime=null;
+}
+}
+},1000);
+
+/* QUOTES SAME + ADD */
 const baseQuotes=[
 "Discipline equals freedom. — Jocko Willink",
 "Stay hungry, stay foolish. — Steve Jobs",
@@ -418,12 +452,28 @@ for(let i=0;i<100;i++){
 quotes.push(...baseQuotes);
 }
 
+/* EXTRA ADD */
+quotes.push(
+"Push yourself daily",
+"Focus on your goal",
+"Success starts now",
+"Be unstoppable"
+);
+
+/* LOAD */
 function loadQuote(){
 let index=Math.floor(Math.random()*quotes.length);
 document.getElementById("quote").innerText=quotes[index];
 }
 
-setInterval(loadQuote,10000);
+/* AUTO */
+setInterval(loadQuote,8000);
+
+/* FORCE LOAD */
+window.addEventListener("load",()=>{
+loadQuote();
+document.getElementById("quote").style.display="block";
+});
 
 </script>
 
