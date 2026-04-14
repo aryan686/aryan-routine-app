@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Aryan Ultimate Routine</title>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js"></script>
+
+<style>
+
+/* 🔥 PREMIUM BACKGROUND */
+body{
+margin:0;
+font-family:-apple-system;
+background:linear-gradient(135deg,#0f0f0f,#1a1a1a);
+color:white;
+overflow-x:hidden;
+}
+
+/* LOGIN */
+#login{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+}
+.login-box{
+background:rgba(255,255,255,0.05);
+backdrop-filter:blur(20px);
+padding:40px;
+border-radius:25px;
+box-shadow:0 0 40px rgba(201,166,70,0.3);
+text-align:center;
+}
+.login-box h2{ color:#c9a646; }
+.login-box input{
+padding:12px;
+width:220px;
+border-radius:12px;
+border:none;
+outline:none;
+}
+.login-box button{
+margin-top:15px;
+padding:10px 30px;
+background:#c9a646;
+color:black;
+border:none;
+border-radius:12px;
+cursor:pointer;
+}
+
+/* HEADER */
+.header{
+text-align:center;
+font-size:28px;
+color:#c9a646;
+margin-top:10px;
+}
+.subHeader{
+text-align:center;
+font-size:14px;
+opacity:0.7;
+margin-bottom:20px;
+}
+
+/* TIME + STREAK */
+#time{
+position:absolute;
+top:10px;
+right:20px;
+font-size:12px;
+}
+#streak{
+position:absolute;
+top:50px;
+right:20px;
+background:rgba(255,255,255,0.1);
+padding:10px 15px;
+border-radius:20px;
+}
+
+/* TASK CARD */
+.task{
+background:rgba(255,255,255,0.05);
+backdrop-filter:blur(20px);
+padding:18px;
+margin:10px auto;
+width:95%;
+border-radius:20px;
+cursor:pointer;
+transition:0.3s;
+border-left:5px solid #c9a646;
+}
+.task:hover{
+transform:scale(1.02);
+box-shadow:0 0 20px rgba(201,166,70,0.3);
+}
+
+/* SUBTASK */
+.sub{
+max-height:0;
+overflow:hidden;
+transition:0.4s;
+margin-left:20px;
+}
+.check{
+display:flex;
+align-items:center;
+gap:10px;
+margin:6px 0;
+}
+.box{
+width:18px;
+height:18px;
+border:2px solid #c9a646;
+display:flex;
+align-items:center;
+justify-content:center;
+cursor:pointer;
+transition:0.2s;
+}
+.checked{
+background:#c9a646;
+transform:scale(1.2);
+}
+.checked::after{
+content:"✔";
+color:black;
+}
+
+/* DONE BUTTON */
+#doneBtn{
+display:none;
+text-align:center;
+margin-top:20px;
+}
+#doneBtn button{
+padding:12px 25px;
+background:#c9a646;
+color:black;
+border:none;
+border-radius:12px;
+}
+
+/* QUOTE */
+#quote{
+position:fixed;
+bottom:20px;
+left:20px;
+background:rgba(255,255,255,0.05);
+padding:10px 20px;
+border-radius:15px;
+font-size:12px;
+display:none;
+}
+
+/* PROGRESS BAR */
+#progress{
+width:90%;
+height:8px;
+background:#333;
+margin:10px auto;
+border-radius:10px;
+overflow:hidden;
+}
+#bar{
+height:100%;
+width:0%;
+background:#c9a646;
+transition:0.3s;
+}
+
+/* POPUP */
+.popup{
+position:fixed;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+padding:20px 40px;
+background:#c9a646;
+color:black;
+border-radius:20px;
+opacity:0;
+transition:0.5s;
+}
+.show{ opacity:1; }
+
+</style>
+</head>
+
+<body>
+
+<div id="popup" class="popup"></div>
+
+<div id="login">
+<div class="login-box">
+<h2>Enter Your Name</h2>
+<input id="name">
+<br>
+<button onclick="login()">Enter</button>
+</div>
+</div>
+
+<div id="app" style="display:none">
+
+<div class="header" id="greet"></div>
+<div class="subHeader">Stay disciplined today 🔥</div>
+
+<div id="progress"><div id="bar"></div></div>
+
+<div id="time"></div>
+<div id="streak">🔥 0</div>
+
+<!-- SAME TASKS -->
+<div class="task" onclick="toggle('a')">Wake Up (5 AM)
+<div id="a" class="sub">
+<div class="check"><div class="box" onclick="tick(this)"></div>No Snooze</div>
+<div class="check"><div class="box" onclick="tick(this)"></div>Water</div>
+</div></div>
+
+<div class="task" onclick="toggle('b')">Fresh + Bath
+<div id="b" class="sub">
+<div class="check"><div class="box" onclick="tick(this)"></div>Brush</div>
+<div class="check"><div class="box" onclick="tick(this)"></div>Bath</div>
+</div></div>
+
+<div class="task" onclick="toggle('c')">Running (6–7 AM)
+<div id="c" class="sub">
+<div class="check"><div class="box" onclick="tick(this)"></div>Running</div>
+</div></div>
+
+<div class="task" onclick="toggle('d')">Exercise + Yoga
+<div id="d" class="sub">
+<div class="check"><div class="box" onclick="tick(this)"></div>Height Exercise</div>
+<div class="check"><div class="box" onclick="tick(this)"></div>Yoga</div>
+</div></div>
+
+<div class="task" onclick="toggle('e')">Study (8–11 AM)
+<div id="e" class="sub">
+<div class="check"><div class="box" onclick="tick(this)"></div>Physics</div>
+<div class="check"><div class="box" onclick="tick(this)"></div>Chemistry</div>
+<div class="check"><div class="box" onclick="tick(this)"></div>Biology</div>
+<div class="check"><div class="box" onclick="tick(this)"></div>Maths</div>
+<div class="check"><div class="box" onclick="tick(this)"></div>GK/GS</div>
+</div></div>
+
+<div class="task" onclick="toggle('f')">Coding
+<div id="f" class="sub">
+<div class="check"><div class="box" onclick="tick(this)"></div>Python</div>
+<div class="check"><div class="box" onclick="tick(this)"></div>Skills</div>
+</div></div>
+
+<div class="task" onclick="toggle('g')">Night (10–11 PM)
+<div id="g" class="sub">
+<div class="check"><div class="box" onclick="tick(this)"></div>Sleep</div>
+</div></div>
+
+<div id="doneBtn">
+<button onclick="done()">Done</button>
+</div>
+
+</div>
+
+<div id="quote"></div>
+
+<script>
+
+/* FIREBASE (SAME) */
+const firebaseConfig = {
+  apiKey: "AIzaSyARfGVJuI_xTmWkWZLcHY-ia783a8lcDVg",
+  authDomain: "aryan-routine-app.firebaseapp.com",
+  projectId: "aryan-routine-app",
+  storageBucket: "aryan-routine-app.firebasestorage.app",
+  messagingSenderId: "418648573101",
+  appId: "1:418648573101:web:873efcc955beb820657224",
+  measurementId: "G-D82HSCHL2W"
+};
+firebase.initializeApp(firebaseConfig);
+
+/* SOUND */
+const sound=new Audio("https://www.fesliyanstudios.com/play-mp3/387");
+
+/* GREETING */
+function setGreeting(){
+let h=new Date().getHours();
+let msg="Good Morning";
+if(h>=12) msg="Good Afternoon";
+if(h>=17) msg="Good Evening";
+document.getElementById("greet").innerText=msg+", Aryan ☀️";
+}
+
+/* LOGIN */
+function login(){
+let name=document.getElementById("name").value;
+if(name==="Aryan"){
+showPopup("ACCESS GRANTED");
+setTimeout(()=>{
+document.getElementById("login").style.display="none";
+document.getElementById("app").style.display="block";
+setGreeting();
+loadQuote();
+document.getElementById("quote").style.display="block";
+startReminders();
+},1500);
+}else showPopup("ACCESS DENIED");
+}
+
+/* POPUP */
+function showPopup(msg){
+let p=document.getElementById("popup");
+p.innerText=msg;
+p.classList.add("show");
+setTimeout(()=>p.classList.remove("show"),1500);
+}
+
+/* TOGGLE */
+function toggle(id){
+let el=document.getElementById(id);
+el.style.maxHeight=el.style.maxHeight?null:el.scrollHeight+"px";
+}
+
+/* PROGRESS */
+function updateProgress(){
+let all=document.querySelectorAll(".box");
+let checked=document.querySelectorAll(".checked");
+let percent=(checked.length/all.length)*100;
+document.getElementById("bar").style.width=percent+"%";
+}
+
+/* TICK */
+function tick(el){
+event.stopPropagation();
+sound.play();
+el.classList.toggle("checked");
+updateProgress();
+}
+
+/* REMINDER SAME */
+function startReminders(){}
+
+const quotes=["Discipline equals freedom.","Stay hungry.","Consistency = success."];
+function loadQuote(){
+let i=new Date().getDate()%quotes.length;
+document.getElementById("quote").innerText=quotes[i];
+}
+
+</script>
+
+</body>
+</html>
